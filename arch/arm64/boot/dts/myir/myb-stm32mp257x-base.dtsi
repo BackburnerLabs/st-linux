@@ -27,7 +27,7 @@
 
 / {
 	model = "MYiR STM32MP257x Evaluation Board";
-	compatible = "st,stm32mp257f-dk", "st,stm32mp257";
+	compatible = "st,stm32mp257";
 
 	aliases {
 		ethernet2 = &eth2;
@@ -679,7 +679,7 @@
 };
 
 &combophy {
-	#if (OTG_USB3_0)
+#if (OTG_USB3_0)
 	clocks = <&rcc CK_BUS_USB3PCIEPHY>, <&rcc CK_KER_USB3PCIEPHY>;
     clock-names = "apb-clk", "ker-clk";
 #else
@@ -844,51 +844,51 @@
 		status = "okay";
 	};
 
-        es8328_codec: es8328@10 {
-                status = "okay";
-                #sound-dai-cells = <0>;
-                compatible = "everest,es8388";
-                reg = <0x10>;
-                // clocks = <&clk_ext_sound>;
-                // clock-names = "mclk";
-                clocks = <&i2s1>;
-                clock-names = "MCLK";
- 
-                port {
-                        #address-cells = <0x1>;
-                        #size-cells = <0x0>;
-                        port@0 {
-                                reg = <0>;
-                                es8328_endpoint: endpoint {
-                                        remote-endpoint = <&i2s1_endpoint>;
-                                };
-                        };
+    es8328_codec: es8328@10 {
+        status = "okay";
+        #sound-dai-cells = <0>;
+        compatible = "everest,es8388";
+        reg = <0x10>;
+        // clocks = <&clk_ext_sound>;
+        // clock-names = "mclk";
+        clocks = <&i2s1>;
+        clock-names = "MCLK";
+
+        port {
+            #address-cells = <0x1>;
+            #size-cells = <0x0>;
+            port@0 {
+                reg = <0>;
+                es8328_endpoint: endpoint {
+                        remote-endpoint = <&i2s1_endpoint>;
                 };
+            };
         };
+    };
 
     stusb1600@28 {
-            compatible = "st,stusb1600";
-            reg = <0x28>;
-            interrupt-parent = <&gpioz>;
-            interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
-            pinctrl-names = "default";
-            reset-gpios = <&gpioz 2 GPIO_ACTIVE_HIGH>;
-            status = "okay";
+        compatible = "st,stusb1600";
+        reg = <0x28>;
+        interrupt-parent = <&gpioz>;
+        interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+        pinctrl-names = "default";
+        reset-gpios = <&gpioz 2 GPIO_ACTIVE_HIGH>;
+        status = "okay";
 
 
-            connector {
-                    compatible = "usb-c-connector";
-                    label = "USB-C";
-                    power-role = "dual";
-                    typec-power-opmode = "default";
+        connector {
+            compatible = "usb-c-connector";
+            label = "USB-C";
+            power-role = "dual";
+            typec-power-opmode = "default";
 
-                    port {
-                            typec_ep: endpoint {
-                                    remote-endpoint = <&dwc3_ep>;
-                            };
+            port {
+                    typec_ep: endpoint {
+                            remote-endpoint = <&dwc3_ep>;
                     };
             };
-		};
+        };
+	};
 };
 
 &i2c3 {
@@ -1373,8 +1373,8 @@
         snps,incr-burst-type-adjustment = <4>;
         dr_mode = "otg";
 		usb-role-switch;
-        //role-switch-default-mode = "peripheral";
-        role-switch-default-mode = "host";
+        role-switch-default-mode = "peripheral";
+        //role-switch-default-mode = "host";
         snps,dis_u2_susphy_quirk;
         snps,dis_u3_susphy_quirk;
         snps,dis_enblslpm_quirk;

@@ -148,6 +148,13 @@ properties:
           - const: engicam,microgea-stm32mp1
           - const: st,stm32mp157
 
+      - description: MYiR MYD-LD25X / MYD-LF25X System-in-Package based boards
+        items:
+          - enum:
+              - myir,myd-ld25x
+              - myir,myd-lf25x
+          - const: st,stm32mp257
+
       - description: Octavo OSD32MP15x System-in-Package based boards
         items:
           - enum:
