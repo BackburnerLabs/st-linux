@@ -1,0 +1,611 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
+/*
+ * Copyright (C) Savers 2026 - All Rights Reserved
+ *
+ * Savers MYD-LF25X carrier-board simple interfaces.
+ *
+ * Pin assignments and alternate functions are taken from STM32CubeMX
+ * (Savers.ioc -> CA35/DeviceTree/Savers/kernel/stm32mp257f-savers-mx.dts),
+ * for the Cortex-A35 / Linux side only. This is the authoritative source for
+ * the AF numbers and electrical pin config below.
+ *
+ * Scope (simple, low-speed carrier interfaces):
+ *   I2C1/2/3/8, USART1/3/6, SPI1/2/3/5, ADC3, TIM4/5/20 PWM, gpio-line-names.
+ *
+ * NOT taken from CubeMX (left to their existing owners):
+ *   - Ethernet, SDMMC1 (SD), SDMMC3 (SDIO), USB, DDR, eMMC, PMIC/RCC (SoM).
+ *   - USART2 is the console; it is already configured by the MYiR SoM base.
+ *
+ * NOTE: CubeMX assigned SPI1, ADC3 and TIM3/16/17 to the Cortex-M33. SPI1 and
+ * ADC3 are exposed to Linux here (Zephyr no longer uses them). The quadrature
+ * encoder on TIM3/16/17 is left disabled in Linux — see the note near &adc3.
+ */
+
+&pinctrl {
+	i2c1_pins_mx: i2c1_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('G', 13, AF9)>, /* I2C1_SCL */
+				 <STM32_PINMUX('I', 1, AF9)>; /* I2C1_SDA */
+			bias-disable;
+			drive-open-drain;
+			slew-rate = <0>;
+		};
+	};
+	i2c1_sleep_pins_mx: i2c1_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('G', 13, ANALOG)>, /* I2C1_SCL */
+				 <STM32_PINMUX('I', 1, ANALOG)>; /* I2C1_SDA */
+		};
+	};
+
+	i2c2_pins_mx: i2c2_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 0, AF9)>, /* I2C2_SDA */
+				 <STM32_PINMUX('F', 2, AF9)>; /* I2C2_SCL */
+			bias-disable;
+			drive-open-drain;
+			slew-rate = <0>;
+		};
+	};
+	i2c2_sleep_pins_mx: i2c2_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 0, ANALOG)>, /* I2C2_SDA */
+				 <STM32_PINMUX('F', 2, ANALOG)>; /* I2C2_SCL */
+		};
+	};
+
+	i2c3_pins_mx: i2c3_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('C', 12, AF9)>, /* I2C3_SCL */
+				 <STM32_PINMUX('G', 0, AF9)>; /* I2C3_SDA */
+			bias-disable;
+			drive-open-drain;
+			slew-rate = <0>;
+		};
+	};
+	i2c3_sleep_pins_mx: i2c3_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('C', 12, ANALOG)>, /* I2C3_SCL */
+				 <STM32_PINMUX('G', 0, ANALOG)>; /* I2C3_SDA */
+		};
+	};
+
+	spi2_pins_mx: spi2_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('B', 0, AF2)>, /* SPI2_SCK */
+				 <STM32_PINMUX('B', 2, AF2)>; /* SPI2_MOSI */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	spi2_sleep_pins_mx: spi2_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('B', 0, ANALOG)>, /* SPI2_SCK */
+				 <STM32_PINMUX('B', 2, ANALOG)>; /* SPI2_MOSI */
+		};
+	};
+
+	spi3_pins_mx: spi3_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('B', 7, AF1)>, /* SPI3_SCK */
+				 <STM32_PINMUX('B', 8, AF1)>, /* SPI3_MOSI */
+				 <STM32_PINMUX('B', 10, AF1)>; /* SPI3_MISO */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	spi3_sleep_pins_mx: spi3_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('B', 7, ANALOG)>, /* SPI3_SCK */
+				 <STM32_PINMUX('B', 8, ANALOG)>, /* SPI3_MOSI */
+				 <STM32_PINMUX('B', 10, ANALOG)>; /* SPI3_MISO */
+		};
+	};
+
+	spi5_pins_mx: spi5_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 12, AF2)>, /* SPI5_MISO */
+				 <STM32_PINMUX('G', 6, AF2)>, /* SPI5_SCK */
+				 <STM32_PINMUX('I', 5, AF2)>; /* SPI5_MOSI */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	spi5_sleep_pins_mx: spi5_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 12, ANALOG)>, /* SPI5_MISO */
+				 <STM32_PINMUX('G', 6, ANALOG)>, /* SPI5_SCK */
+				 <STM32_PINMUX('I', 5, ANALOG)>; /* SPI5_MOSI */
+		};
+	};
+
+	tim4_pins_mx: tim4_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 6, AF9)>; /* TIM4_CH3 */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim4_sleep_pins_mx: tim4_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 6, ANALOG)>; /* TIM4_CH3 */
+		};
+	};
+	tim4_pwm_pins_mx: tim4_pwm_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 4, AF9)>, /* TIM4_CH1 (RGB1_R) */
+				 <STM32_PINMUX('D', 5, AF9)>, /* TIM4_CH2 (RGB1_G) */
+				 <STM32_PINMUX('D', 7, AF9)>; /* TIM4_CH4 (LED_ILL) */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim4_pwm_sleep_pins_mx: tim4_pwm_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 4, ANALOG)>, /* TIM4_CH1 (RGB1_R) */
+				 <STM32_PINMUX('D', 5, ANALOG)>, /* TIM4_CH2 (RGB1_G) */
+				 <STM32_PINMUX('D', 7, ANALOG)>; /* TIM4_CH4 (LED_ILL) */
+		};
+	};
+
+	tim5_pwm_pins_mx: tim5_pwm_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('G', 9, AF8)>; /* TIM5_CH4 (PWM_FAN) */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim5_pwm_sleep_pins_mx: tim5_pwm_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('G', 9, ANALOG)>; /* TIM5_CH4 (PWM_FAN) */
+		};
+	};
+
+	tim20_pwm_pins_mx: tim20_pwm_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('B', 6, AF8)>; /* TIM20_CH1N */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim20_pwm_sleep_pins_mx: tim20_pwm_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('B', 6, ANALOG)>; /* TIM20_CH1N */
+		};
+	};
+
+	usart1_pins_mx: usart1_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('G', 14, AF6)>, /* USART1_TX */
+				 <STM32_PINMUX('I', 2, AF6)>; /* USART1_RTS */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('G', 15, AF6)>, /* USART1_RX */
+				 <STM32_PINMUX('I', 3, AF6)>; /* USART1_CTS */
+			bias-disable;
+			drive-push-pull;
+		};
+	};
+	usart1_idle_pins_mx: usart1_idle_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('G', 14, ANALOG)>, /* USART1_TX */
+				 <STM32_PINMUX('I', 3, ANALOG)>; /* USART1_CTS */
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('G', 15, AF6)>; /* USART1_RX */
+			bias-disable;
+			drive-push-pull;
+		};
+		pins3 {
+			pinmux = <STM32_PINMUX('I', 2, AF6)>; /* USART1_RTS */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	usart1_sleep_pins_mx: usart1_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('G', 14, ANALOG)>, /* USART1_TX */
+				 <STM32_PINMUX('G', 15, ANALOG)>, /* USART1_RX */
+				 <STM32_PINMUX('I', 2, ANALOG)>, /* USART1_RTS */
+				 <STM32_PINMUX('I', 3, ANALOG)>; /* USART1_CTS */
+		};
+	};
+
+	usart3_pins_mx: usart3_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('F', 13, AF6)>, /* USART3_CTS */
+				 <STM32_PINMUX('I', 7, AF6)>; /* USART3_RX */
+			bias-disable;
+			drive-push-pull;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('F', 14, AF6)>, /* USART3_RTS */
+				 <STM32_PINMUX('I', 6, AF6)>; /* USART3_TX */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	usart3_idle_pins_mx: usart3_idle_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('F', 13, ANALOG)>, /* USART3_CTS */
+				 <STM32_PINMUX('I', 6, ANALOG)>; /* USART3_TX */
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('F', 14, AF6)>; /* USART3_RTS */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+		pins3 {
+			pinmux = <STM32_PINMUX('I', 7, AF6)>; /* USART3_RX */
+			bias-disable;
+			drive-push-pull;
+		};
+	};
+	usart3_sleep_pins_mx: usart3_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 13, ANALOG)>, /* USART3_CTS */
+				 <STM32_PINMUX('F', 14, ANALOG)>, /* USART3_RTS */
+				 <STM32_PINMUX('I', 6, ANALOG)>, /* USART3_TX */
+				 <STM32_PINMUX('I', 7, ANALOG)>; /* USART3_RX */
+		};
+	};
+
+	usart6_pins_mx: usart6_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('C', 3, AF6)>, /* USART6_RTS */
+				 <STM32_PINMUX('F', 5, AF6)>; /* USART6_TX */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('C', 8, AF6)>, /* USART6_CTS */
+				 <STM32_PINMUX('F', 4, AF6)>; /* USART6_RX */
+			bias-disable;
+			drive-push-pull;
+		};
+	};
+	usart6_idle_pins_mx: usart6_idle_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('C', 3, AF6)>; /* USART6_RTS */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('C', 8, ANALOG)>, /* USART6_CTS */
+				 <STM32_PINMUX('F', 5, ANALOG)>; /* USART6_TX */
+		};
+		pins3 {
+			pinmux = <STM32_PINMUX('F', 4, AF6)>; /* USART6_RX */
+			bias-disable;
+			drive-push-pull;
+		};
+	};
+	usart6_sleep_pins_mx: usart6_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('C', 3, ANALOG)>, /* USART6_RTS */
+				 <STM32_PINMUX('C', 8, ANALOG)>, /* USART6_CTS */
+				 <STM32_PINMUX('F', 4, ANALOG)>, /* USART6_RX */
+				 <STM32_PINMUX('F', 5, ANALOG)>; /* USART6_TX */
+		};
+	};
+
+	/* --- Peripherals CubeMX assigned to the M33, exposed in Linux on request --- */
+
+	spi1_pins_mx: spi1_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 11, AF2)>, /* SPI1_SCK */
+				 <STM32_PINMUX('D', 9, AF2)>, /* SPI1_MOSI */
+				 <STM32_PINMUX('D', 1, AF2)>; /* SPI1_MISO */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	spi1_sleep_pins_mx: spi1_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('D', 11, ANALOG)>, /* SPI1_SCK */
+				 <STM32_PINMUX('D', 9, ANALOG)>, /* SPI1_MOSI */
+				 <STM32_PINMUX('D', 1, ANALOG)>; /* SPI1_MISO */
+		};
+	};
+
+	adc3_pins_mx: adc3_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('F', 10, ANALOG)>; /* ADC3_INP2 */
+		};
+	};
+
+	tim3_pins_mx: tim3_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('C', 11, AF7)>; /* TIM3_CH1 (encoder A/B) */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim3_sleep_pins_mx: tim3_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('C', 11, ANALOG)>; /* TIM3_CH1 (encoder A/B) */
+		};
+	};
+
+	tim16_pins_mx: tim16_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('H', 6, AF7)>; /* TIM16_CH1N (ENC_N) */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim16_sleep_pins_mx: tim16_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('H', 6, ANALOG)>; /* TIM16_CH1N (ENC_N) */
+		};
+	};
+
+	tim17_pins_mx: tim17_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('H', 7, AF7)>; /* TIM17_CH1 (encoder A/B) */
+			bias-disable;
+			drive-push-pull;
+			slew-rate = <0>;
+		};
+	};
+	tim17_sleep_pins_mx: tim17_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('H', 7, ANALOG)>; /* TIM17_CH1 (encoder A/B) */
+		};
+	};
+};
+
+&pinctrl_z {
+	i2c8_pins_z_mx: i2c8_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('Z', 3, AF8)>, /* I2C8_SDA */
+				 <STM32_PINMUX('Z', 4, AF8)>; /* I2C8_SCL */
+			bias-disable;
+			drive-open-drain;
+			slew-rate = <0>;
+		};
+	};
+	i2c8_sleep_pins_z_mx: i2c8_sleep_mx-0 {
+		pins {
+			pinmux = <STM32_PINMUX('Z', 3, ANALOG)>, /* I2C8_SDA */
+				 <STM32_PINMUX('Z', 4, ANALOG)>; /* I2C8_SCL */
+		};
+	};
+};
+
+/* ------------------------- Controller enables ------------------------- */
+
+&i2c1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&i2c1_pins_mx>;
+	pinctrl-1 = <&i2c1_sleep_pins_mx>;
+	status = "okay";
+};
+
+&i2c2 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&i2c2_pins_mx>;
+	pinctrl-1 = <&i2c2_sleep_pins_mx>;
+	status = "okay";
+};
+
+&i2c3 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&i2c3_pins_mx>;
+	pinctrl-1 = <&i2c3_sleep_pins_mx>;
+	status = "okay";
+};
+
+&i2c8 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&i2c8_pins_z_mx>;
+	pinctrl-1 = <&i2c8_sleep_pins_z_mx>;
+	status = "okay";
+};
+
+&usart1 {
+	pinctrl-names = "default", "idle", "sleep";
+	pinctrl-0 = <&usart1_pins_mx>;
+	pinctrl-1 = <&usart1_idle_pins_mx>;
+	pinctrl-2 = <&usart1_sleep_pins_mx>;
+	status = "okay";
+};
+
+&usart3 {
+	pinctrl-names = "default", "idle", "sleep";
+	pinctrl-0 = <&usart3_pins_mx>;
+	pinctrl-1 = <&usart3_idle_pins_mx>;
+	pinctrl-2 = <&usart3_sleep_pins_mx>;
+	status = "okay";
+};
+
+&usart6 {
+	pinctrl-names = "default", "idle", "sleep";
+	pinctrl-0 = <&usart6_pins_mx>;
+	pinctrl-1 = <&usart6_idle_pins_mx>;
+	pinctrl-2 = <&usart6_sleep_pins_mx>;
+	status = "okay";
+};
+
+/*
+ * SPI controllers are enabled with their CubeMX pinmux. Chip-selects are kept
+ * as GPIOs (see gpio-line-names: DISPLAY_CS, EXPAN_CS). Add cs-gpios and the
+ * SPI child device nodes when the actual devices are wired up.
+ */
+&spi2 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&spi2_pins_mx>;
+	pinctrl-1 = <&spi2_sleep_pins_mx>;
+	status = "okay";
+};
+
+&spi3 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&spi3_pins_mx>;
+	pinctrl-1 = <&spi3_sleep_pins_mx>;
+	status = "okay";
+};
+
+&spi5 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&spi5_pins_mx>;
+	pinctrl-1 = <&spi5_sleep_pins_mx>;
+	status = "okay";
+};
+
+/*
+ * PWM outputs (RGB / illumination LEDs on TIM4, fan on TIM5_CH4, TIM20_CH1N).
+ * Per the st,stm32mp25-timers binding, pinctrl lives on the `pwm` child node,
+ * not the parent timer.
+ */
+&timers4 {
+	status = "okay";
+	pwm {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&tim4_pwm_pins_mx>, <&tim4_pins_mx>;
+		pinctrl-1 = <&tim4_pwm_sleep_pins_mx>, <&tim4_sleep_pins_mx>;
+		status = "okay";
+	};
+};
+
+&timers5 {
+	status = "okay";
+	pwm {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&tim5_pwm_pins_mx>;
+		pinctrl-1 = <&tim5_pwm_sleep_pins_mx>;
+		status = "okay";
+	};
+};
+
+&timers20 {
+	status = "okay";
+	pwm {
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&tim20_pwm_pins_mx>;
+		pinctrl-1 = <&tim20_pwm_sleep_pins_mx>;
+		status = "okay";
+	};
+};
+
+/* --- Peripherals CubeMX assigned to the M33, exposed in Linux on request --- */
+
+&spi1 {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&spi1_pins_mx>;
+	pinctrl-1 = <&spi1_sleep_pins_mx>;
+	cs-gpios = <&gpiod 0 GPIO_ACTIVE_LOW>;	/* STM_AX_SPI1_CS (PD0) */
+	status = "okay";
+};
+
+&adc_3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&adc3_pins_mx>;
+	vdda-supply = <&scmi_v3v3>;
+	vref-supply = <&scmi_v3v3>;	/* ADC reference rail = 3V3 */
+	status = "okay";
+};
+
+&adc3 {
+	status = "okay";
+	channel@2 {
+		reg = <2>;		/* PF10 = ADC3_INP2 */
+		st,min-sample-time-ns = <400>;
+	};
+};
+
+/*
+ * Quadrature encoder (ENC_A=PC11/TIM3_CH1, ENC_B=PH7/TIM17_CH1,
+ * ENC_N=PH6/TIM16_CH1N) is intentionally NOT enabled in Linux. TIM16/TIM17 are
+ * basic single-channel timers and cannot do hardware quadrature mode, so this
+ * is a real-time edge-capture job better suited to the Cortex-M33. Pin groups
+ * tim3/tim16/tim17_*_mx remain defined above for reference. Revisit once the
+ * encoder ownership is decided (see commit notes / README).
+ */
+
+/* ----------------- GPIO line names (from CubeMX labels) ----------------- */
+/* Each entry names a bank line in pin order; the trailing comment gives the
+ * pin range, so e.g. PI9 = DOOR_OPEN is readable at a glance. Empty entries
+ * are unlabeled or muxed to a peripheral (see the pinctrl groups above). */
+
+&gpioa {
+	gpio-line-names =
+		"", "STM_AX_FLT1", "STM_AX_RST2", "STM_AX_WAKE0",	/* PA0-PA3 */
+		"", "STM_AX_RST0", "STM_AX_RST1", "STM_AX_FLT0";		/* PA4-PA7 */
+};
+
+&gpiob {
+	gpio-line-names =
+		"", "SLED_LEFT", "", "DISPLAY_CS",	/* PB0-PB3 */
+		"GP0", "GP1", "", "",			/* PB4-PB7 */
+		"", "STM_AX_EN0", "", "EXPAN_CS";	/* PB8-PB11 */
+};
+
+&gpioc {
+	gpio-line-names =
+		"", "", "", "",						/* PC0-PC3 */
+		"SOLENOID2", "BUTTON_USER1", "STM_AX_FLT2", "EEPROM_WC",	/* PC4-PC7 */
+		"", "SOLENOID0", "USB3_EN";				/* PC8-PC10 */
+};
+
+&gpiod {
+	gpio-line-names =
+		"STM_AX_SPI1_CS", "", "STM_AX_EN2", "uSD_DETECT",	/* PD0-PD3 */
+		"", "", "", "",						/* PD4-PD7 */
+		"RES_N", "", "STM_AX_EN1";				/* PD8-PD10 */
+};
+
+&gpiof {
+	gpio-line-names =
+		"", "", "", "",						/* PF0-PF3 */
+		"", "", "STM_AX_WAKE2", "MOM2",				/* PF4-PF7 */
+		"ADC_ALERT", "SOLENOID1", "", "PEDESTAL_TRIGGER_L",	/* PF8-PF11 */
+		"", "", "", "MOM0";					/* PF12-PF15 */
+};
+
+&gpiog {
+	gpio-line-names =
+		"", "", "BT_HOST_WAKE", "GP2",			/* PG0-PG3 */
+		"BT_REG_ON", "MOM1", "", "BT_PCM_WS",		/* PG4-PG7 */
+		"WL_REG_ON", "", "SLED_RIGHT", "WL_HOST_WAKE",	/* PG8-PG11 */
+		"PEDESTAL_CLAMP";				/* PG12 */
+};
+
+&gpioh {
+	gpio-line-names =
+		"", "", "USBSW_OE", "USB3SW_S",		/* PH0-PH3 */
+		"LED1", "DISPLAY_DC", "", "",		/* PH4-PH7 (PH6/PH7 = encoder, TIM16/17) */
+		"STM_AX_WAKE1";				/* PH8 */
+};
+
+&gpioi {
+	gpio-line-names =
+		"TAG_PRESENCE", "", "", "",		/* PI0-PI3 */
+		"ETH1_PHY_RST", "", "", "",		/* PI4-PI7 */
+		"", "DOOR_OPEN", "SLED_NEEDLING";	/* PI8-PI10 */
+};
+
+&gpioz {
+	gpio-line-names =
+		"PANEL_OPEN", "PEDESTAL_TRIGGER_R", "GP3", "",	/* PZ0-PZ3 */
+		"", "SLED_LOADING", "", "CAM_HOMING",		/* PZ4-PZ7 */
+		"CUTTER_HOMING", "GP4";				/* PZ8-PZ9 */
+};
