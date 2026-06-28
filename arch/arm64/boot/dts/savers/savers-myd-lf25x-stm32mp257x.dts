@@ -11,8 +11,8 @@
 #include "stm32mp25xf.dtsi"
 #include "stm32mp25-pinctrl.dtsi"
 #include "stm32mp25xxak-pinctrl.dtsi"
-#include "savers-myd-lf25x-resmem.dtsi"
-#include "savers-myd-lf25x-mx.dtsi"
+#include "savers-myd-lf25x-stm32mp257x-resmem.dtsi"
+#include "savers-myd-lf25x-stm32mp257x-mx.dtsi"
  
 / {
 	model = "Savers ATS Controller with MYiR MYD-LF25X";
